@@ -199,7 +199,10 @@
 
   - Đảm bảo tất cả tests pass, hỏi người dùng nếu có vấn đề phát sinh.
 
-- [ ] 8. Tạo ảnh huấn luyện mẫu và test thực tế
+- [-] 8. Tạo ảnh huấn luyện mẫu và test thực tế
+
+
+
   - Tạo thư mục myface/ với 5-7 ảnh mẫu
   - Chạy backend và test với Postman hoặc curl
   - Test với ảnh của chính người dùng (should match)
@@ -208,7 +211,9 @@
   - Test với ảnh đeo kính
   - _Requirements: 3.5, 3.6_
 
-- [ ] 8.1 Viết integration tests end-to-end
+- [x] 8.1 Viết integration tests end-to-end
+
+
   - Test flow hoàn chỉnh từ upload đến response
   - Test với nhiều ảnh khác nhau
   - Test concurrent requests
