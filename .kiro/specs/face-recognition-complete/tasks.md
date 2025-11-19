@@ -334,16 +334,26 @@
 
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Implement Frontend Web - Core Functions
+- [x] 12. Implement Frontend Web - Core Functions
 
-- [ ] 12.1 Create API client functions
+
+
+
+
+
+- [x] 12.1 Create API client functions
+
+
   - Viết hàm `call_collect_api(image_bytes)` gọi POST /api/v1/collect
   - Viết hàm `call_train_api()` gọi POST /api/v1/train
   - Viết hàm `call_verify_api(image_bytes, threshold)` gọi POST /api/v1/face/verify
   - Handle errors và parse JSON responses
   - _Requirements: 5.3, 5.5, 5.7_
 
-- [ ] 12.2 Create image processing functions
+
+- [x] 12.2 Create image processing functions
+
+
   - Viết hàm `draw_box(image_bgr, face_box, is_match)` để vẽ bounding box
   - Viết hàm `capture_frame_from_webcam()` để chụp từ webcam
   - _Requirements: 5.8_
