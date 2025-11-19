@@ -432,9 +432,15 @@
   - Handle gallery access
   - _Requirements: 6.2, 6.3_
 
-- [ ] 15. Implement Mobile App - UI and State
+- [x] 15. Implement Mobile App - UI and State
 
-- [ ] 15.1 Create UI components
+
+
+
+
+- [x] 15.1 Create UI components
+
+
   - Tạo AppBar với title "FaceID Mobile"
   - Tạo image display area
   - Tạo threshold slider
@@ -442,18 +448,21 @@
   - Tạo status và detail text displays
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.6, 6.7_
 
-- [ ] 15.2 Implement state management
+- [x] 15.2 Implement state management
+
   - Setup State với các biến: _selectedImage, _threshold, _loading, _status, _detail, _distance
   - Implement setState() calls để update UI
   - Implement loading states
   - _Requirements: 6.8_
 
-- [ ] 15.3 Configure backend connection
+- [x] 15.3 Configure backend connection
+
   - Configure baseUrl với http://10.0.2.2:8000 cho Android emulator
   - Add comment hướng dẫn thay đổi IP cho thiết bị thật
   - _Requirements: 6.9, 6.10_
 
-- [ ] 15.4 Implement error handling and display
+- [x] 15.4 Implement error handling and display
+
   - Handle API errors và hiển thị error messages
   - Parse environment_info từ responses
   - Hiển thị warnings cho user
