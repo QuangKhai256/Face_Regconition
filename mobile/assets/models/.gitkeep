@@ -1,0 +1,3 @@
+# Placeholder for MobileFaceNet TFLite model
+# The actual model file (mobilefacenet.tflite) should be placed in this directory
+# See README.md in this directory for instructions on obtaining the model
