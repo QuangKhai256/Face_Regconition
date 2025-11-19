@@ -42,6 +42,7 @@
 
 
 
+
   - Viết hàm `load_image_bgr_from_bytes(file_bytes)` để decode image từ bytes
   - Viết hàm `extract_single_face_embedding(image_rgb)` để detect face và extract embedding
   - Validate đúng 1 khuôn mặt, raise ValueError nếu 0 hoặc nhiều hơn 1
@@ -59,21 +60,32 @@
   - **Property 7: Training extracts 128-d embeddings**
   - **Validates: Requirements 2.3**
 
-- [ ] 4. Implement Backend - File Validation Module
+- [x] 4. Implement Backend - File Validation Module
+
+
+
+
+
   - Viết hàm `validate_image_magic_bytes(file_bytes)` để check JPEG/PNG magic bytes
   - Implement validation cho content-type
   - Implement validation cho file size (max 10MB)
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
-- [ ] 4.1 Write property test for content-type validation
+- [x] 4.1 Write property test for content-type validation
+
+
   - **Property 15: Content-type validation**
   - **Validates: Requirements 4.1**
 
-- [ ] 4.2 Write property test for file size validation
+- [x] 4.2 Write property test for file size validation
+
+
   - **Property 16: File size validation**
   - **Validates: Requirements 4.3**
 
-- [ ] 4.3 Write property test for magic bytes validation
+- [x] 4.3 Write property test for magic bytes validation
+
+
   - **Property 17: Magic bytes validation**
   - **Validates: Requirements 4.5**
 
