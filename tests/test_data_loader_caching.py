@@ -7,7 +7,7 @@ import shutil
 import time
 from unittest.mock import patch, MagicMock
 import pytest
-from hypothesis import given, strategies as st, settings
+from hypothesis import given, strategies as st, settings, HealthCheck
 
 from backend.data_loader import load_known_face_encodings, get_known_faces_cache
 
@@ -36,7 +36,7 @@ class TestDataLoaderCaching:
         if original_exists:
             shutil.move("myface_backup", "myface")
     
-    @settings(max_examples=10, deadline=None)
+    @settings(max_examples=10, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
     @given(num_calls=st.integers(min_value=2, max_value=10))
     def test_property_face_embeddings_cached(self, temp_myface_dir, num_calls):
         """

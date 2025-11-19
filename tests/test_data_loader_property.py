@@ -8,7 +8,7 @@ import tempfile
 from pathlib import Path
 import numpy as np
 import pytest
-from hypothesis import given, strategies as st, settings
+from hypothesis import given, strategies as st, settings, HealthCheck
 from PIL import Image, ImageDraw
 
 from backend.data_loader import load_known_face_encodings, get_known_faces_cache
@@ -61,7 +61,7 @@ class TestDataLoaderProperties:
         if original_exists:
             shutil.move("myface_backup", "myface")
     
-    @settings(max_examples=10, deadline=None)
+    @settings(max_examples=10, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture])
     @given(
         num_images=st.integers(min_value=1, max_value=5),
         extension=st.sampled_from(['.jpg', '.jpeg', '.png'])

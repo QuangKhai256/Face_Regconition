@@ -159,6 +159,7 @@
 
 
 
+
   - Implement custom exception handlers cho FastAPI
   - Implement xử lý FileNotFoundError với HTTP 500
   - Implement xử lý ValueError với HTTP 400
@@ -191,7 +192,11 @@
   - Test xử lý threshold không hợp lệ
   - _Requirements: 1.5, 6.1, 6.2, 6.3, 6.4, 6.5, 4.4_
 
-- [ ] 7. Checkpoint - Đảm bảo tất cả tests pass
+- [x] 7. Checkpoint - Đảm bảo tất cả tests pass
+
+
+
+
   - Đảm bảo tất cả tests pass, hỏi người dùng nếu có vấn đề phát sinh.
 
 - [ ] 8. Tạo ảnh huấn luyện mẫu và test thực tế
