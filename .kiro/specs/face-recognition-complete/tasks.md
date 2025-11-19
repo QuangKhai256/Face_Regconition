@@ -11,17 +11,26 @@
   - Tạo file __init__.py cho các module Python
   - _Requirements: 7.1, 7.2, 8.2, 8.3, 8.4_
 
-- [ ] 2. Implement Backend - Environment Analysis Module
+- [x] 2. Implement Backend - Environment Analysis Module
+
+
+
+
+
   - Viết hàm `analyze_environment(image_bgr, face_box)` để tính brightness, blur_score, face_size_ratio
   - Implement logic kiểm tra thresholds (is_too_dark, is_too_bright, is_too_blurry, is_face_too_small)
   - Generate warnings list dựa trên các flags
   - _Requirements: 1.4, 1.5, 1.6, 1.7, 1.8, 3.4_
 
-- [ ] 2.1 Write property test for environment metrics calculation
+- [x] 2.1 Write property test for environment metrics calculation
+
+
   - **Property 2: Environment metrics calculation**
   - **Validates: Requirements 1.4, 3.4**
 
-- [ ] 2.2 Write property test for environment threshold consistency
+- [x] 2.2 Write property test for environment threshold consistency
+
+
   - **Property 3: Environment threshold consistency**
   - **Validates: Requirements 1.5, 1.6, 1.7, 1.8**
 

@@ -6,7 +6,7 @@ Handles face processing and comparison functions.
 import numpy as np
 import cv2
 import face_recognition
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 # Magic bytes cho các định dạng ảnh
 IMAGE_MAGIC_BYTES = {
@@ -141,3 +141,71 @@ def compare_with_known_faces(
     is_match = best_distance <= threshold
     
     return is_match, best_distance
+
+
+def analyze_environment(
+    image_bgr: np.ndarray,
+    face_box: Tuple[int, int, int, int]
+) -> Dict:
+    """
+    Phân tích môi trường xung quanh để đánh giá chất lượng ảnh.
+    
+    Args:
+        image_bgr: Ảnh dạng BGR numpy array
+        face_box: Tọa độ khuôn mặt (top, right, bottom, left)
+        
+    Returns:
+        Dictionary chứa:
+        - brightness: Độ sáng trung bình (0-255)
+        - is_too_dark: True nếu brightness < 60
+        - is_too_bright: True nếu brightness > 200
+        - blur_score: Điểm đánh giá độ mờ (phương sai Laplacian)
+        - is_too_blurry: True nếu blur_score < 100
+        - face_size_ratio: Tỷ lệ diện tích khuôn mặt / diện tích ảnh
+        - is_face_too_small: True nếu face_size_ratio < 0.10
+        - warnings: Danh sách cảnh báo
+        
+    Validates: Requirements 1.4, 1.5, 1.6, 1.7, 1.8, 3.4
+    """
+    # Tính brightness (độ sáng trung bình)
+    gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+    brightness = float(np.mean(gray))
+    
+    # Tính blur score (phương sai Laplacian)
+    laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+    blur_score = float(np.var(laplacian))
+    
+    # Tính face size ratio
+    top, right, bottom, left = face_box
+    face_area = (bottom - top) * (right - left)
+    image_height, image_width = image_bgr.shape[:2]
+    image_area = image_height * image_width
+    face_size_ratio = float(face_area / image_area)
+    
+    # Kiểm tra thresholds
+    is_too_dark = brightness < 60
+    is_too_bright = brightness > 200
+    is_too_blurry = blur_score < 100
+    is_face_too_small = face_size_ratio < 0.10
+    
+    # Generate warnings list
+    warnings = []
+    if is_too_dark:
+        warnings.append("Ảnh quá tối. Hãy chụp ở nơi có ánh sáng tốt hơn.")
+    if is_too_bright:
+        warnings.append("Ảnh quá sáng. Hãy tránh ánh sáng trực tiếp quá mạnh.")
+    if is_too_blurry:
+        warnings.append("Ảnh bị mờ. Hãy giữ máy ảnh ổn định và đảm bảo lấy nét tốt.")
+    if is_face_too_small:
+        warnings.append("Khuôn mặt quá nhỏ. Hãy đến gần camera hơn.")
+    
+    return {
+        "brightness": brightness,
+        "is_too_dark": is_too_dark,
+        "is_too_bright": is_too_bright,
+        "blur_score": blur_score,
+        "is_too_blurry": is_too_blurry,
+        "face_size_ratio": face_size_ratio,
+        "is_face_too_small": is_face_too_small,
+        "warnings": warnings
+    }
