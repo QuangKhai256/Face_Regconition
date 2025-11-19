@@ -358,9 +358,15 @@
   - Viết hàm `capture_frame_from_webcam()` để chụp từ webcam
   - _Requirements: 5.8_
 
-- [ ] 13. Implement Frontend Web - UI Tabs
+- [x] 13. Implement Frontend Web - UI Tabs
 
-- [ ] 13.1 Create Tab 1: Thu thập dữ liệu
+
+
+
+
+
+- [x] 13.1 Create Tab 1: Thu thập dữ liệu
+
   - Tạo Streamlit UI với tab "Thu thập dữ liệu"
   - Implement upload ảnh từ máy
   - Implement chụp ảnh từ webcam
@@ -369,14 +375,16 @@
   - Hiển thị environment_info
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 13.2 Create Tab 2: Huấn luyện mô hình
+- [x] 13.2 Create Tab 2: Huấn luyện mô hình
+
   - Tạo tab "Huấn luyện mô hình"
   - Implement button "Bắt đầu huấn luyện"
   - Gọi call_train_api()
   - Hiển thị num_images và num_embeddings
   - _Requirements: 5.1, 5.5, 5.6_
 
-- [ ] 13.3 Create Tab 3: Nhận diện khuôn mặt
+- [x] 13.3 Create Tab 3: Nhận diện khuôn mặt
+
   - Tạo tab "Nhận diện khuôn mặt"
   - Implement slider để điều chỉnh threshold
   - Implement upload ảnh hoặc chụp webcam
@@ -386,7 +394,8 @@
   - Hiển thị environment_info và warnings
   - _Requirements: 5.1, 5.7, 5.8, 5.9_
 
-- [ ] 13.4 Setup main app configuration
+- [x] 13.4 Setup main app configuration
+
   - Setup Streamlit page config (title, icon, layout)
   - Tạo sidebar với threshold slider và instructions
   - Configure backend URL (http://localhost:8000)
