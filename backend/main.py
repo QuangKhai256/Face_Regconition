@@ -8,13 +8,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 import cv2
 import numpy as np
+import logging
+from typing import Dict
 
 from backend.models import VerifyResponse, FaceBox, ImageSize, TrainingInfo
 from backend.data_loader import get_known_faces_cache
 from backend.face_processor import (
     read_image_from_upload,
     extract_single_face_encoding,
-    compare_with_known_faces
+    compare_with_known_faces,
+    validate_image_magic_bytes
 )
 from backend.exceptions import (
     file_not_found_handler,
@@ -23,6 +26,16 @@ from backend.exceptions import (
     http_exception_handler,
     validation_exception_handler
 )
+
+# Cấu hình logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Giới hạn kích thước file upload (10MB)
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB in bytes
 
 
 # Khởi tạo FastAPI app với metadata
@@ -52,12 +65,29 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
 
+@app.on_event("startup")
+async def startup_event():
+    """
+    Khởi tạo hệ thống khi startup.
+    Tải dữ liệu huấn luyện vào cache.
+    """
+    try:
+        logger.info("Đang khởi động Face Recognition Backend...")
+        known_encodings, used_files = get_known_faces_cache()
+        logger.info(f"Đã tải {len(known_encodings)} ảnh huấn luyện thành công: {used_files}")
+        logger.info("Hệ thống sẵn sàng nhận request.")
+    except Exception as e:
+        logger.error(f"Lỗi khi khởi động hệ thống: {str(e)}")
+        raise
+
+
 @app.get("/api/v1/health")
 async def health_check():
     """
     Endpoint kiểm tra trạng thái hệ thống.
     Validates: Requirements 2.1
     """
+    logger.debug("Health check request received")
     return {"status": "ok"}
 
 
@@ -78,9 +108,12 @@ async def verify_face(
         
     Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2, 4.3, 5.1-5.7
     """
+    logger.info(f"Nhận request xác thực khuôn mặt: filename={file.filename}, content_type={file.content_type}, threshold={threshold}")
+    
     # Validation content-type
     valid_content_types = {"image/jpeg", "image/jpg", "image/png"}
     if file.content_type not in valid_content_types:
+        logger.warning(f"Content-type không hợp lệ: {file.content_type}")
         raise HTTPException(
             status_code=400,
             detail="File upload phải là ảnh (.jpg, .jpeg, .png)."
@@ -88,24 +121,48 @@ async def verify_face(
     
     # Đọc file bytes
     file_bytes = await file.read()
+    file_size = len(file_bytes)
+    
+    # Kiểm tra kích thước file (max 10MB)
+    if file_size > MAX_FILE_SIZE:
+        logger.warning(f"File quá lớn: {file_size} bytes (max: {MAX_FILE_SIZE} bytes)")
+        raise HTTPException(
+            status_code=400,
+            detail=f"File quá lớn. Kích thước tối đa cho phép là {MAX_FILE_SIZE // (1024*1024)}MB."
+        )
+    
+    logger.info(f"Kích thước file: {file_size} bytes")
+    
+    # Validation bằng magic bytes
+    if not validate_image_magic_bytes(file_bytes):
+        logger.warning("File không phải là ảnh hợp lệ (magic bytes validation failed)")
+        raise HTTPException(
+            status_code=400,
+            detail="File không phải là ảnh hợp lệ. Vui lòng upload file ảnh thật (.jpg, .jpeg, .png)."
+        )
     
     # Chuyển đổi bytes thành ảnh BGR
     # ValueError will be caught by exception handler
+    logger.info("Đang đọc và decode ảnh...")
     image_bgr = read_image_from_upload(file_bytes)
     
     # Lấy kích thước ảnh
     height, width = image_bgr.shape[:2]
+    logger.info(f"Kích thước ảnh: {width}x{height}")
     
     # Chuyển đổi BGR sang RGB (face_recognition yêu cầu RGB)
     image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
     
     # Trích xuất face embedding và location
     # ValueError will be caught by exception handler
+    logger.info("Đang trích xuất face embedding...")
     unknown_encoding, face_location = extract_single_face_encoding(image_rgb)
+    logger.info(f"Đã trích xuất face embedding thành công. Face location: {face_location}")
     
     # Lấy dữ liệu huấn luyện từ cache
     # FileNotFoundError will be caught by exception handler
     known_encodings, used_files = get_known_faces_cache()
+    logger.info(f"Đang so sánh với {len(known_encodings)} ảnh huấn luyện...")
     
     # So sánh với dữ liệu đã học
     is_match, best_distance = compare_with_known_faces(
@@ -113,6 +170,7 @@ async def verify_face(
         known_encodings,
         threshold
     )
+    logger.info(f"Kết quả so sánh: is_match={is_match}, distance={best_distance:.3f}, threshold={threshold}")
     
     # Tạo message bằng tiếng Việt
     if is_match:
@@ -150,4 +208,5 @@ async def verify_face(
         )
     )
     
+    logger.info(f"Xác thực hoàn tất thành công: {message}")
     return response

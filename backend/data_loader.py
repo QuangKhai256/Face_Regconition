@@ -4,10 +4,13 @@ Handles loading face embeddings from training images in the myface/ directory.
 """
 
 import os
+import logging
 from functools import lru_cache
 from typing import List, Tuple
 import numpy as np
 import face_recognition
+
+logger = logging.getLogger(__name__)
 
 
 def load_known_face_encodings() -> Tuple[List[np.ndarray], List[str]]:
@@ -23,12 +26,15 @@ def load_known_face_encodings() -> Tuple[List[np.ndarray], List[str]]:
         - ValueError: Nếu không tìm thấy ảnh hợp lệ nào
     """
     myface_dir = "myface"
+    logger.info(f"Đang tải dữ liệu huấn luyện từ thư mục '{myface_dir}/'...")
     
     # Kiểm tra thư mục tồn tại
     if not os.path.exists(myface_dir):
+        logger.error(f"Thư mục '{myface_dir}/' không tồn tại")
         raise FileNotFoundError(f"Thư mục '{myface_dir}/' không tồn tại. Vui lòng tạo thư mục và thêm ảnh huấn luyện.")
     
     if not os.path.isdir(myface_dir):
+        logger.error(f"'{myface_dir}/' không phải là thư mục")
         raise FileNotFoundError(f"'{myface_dir}/' không phải là thư mục.")
     
     # Các extension hợp lệ
@@ -45,8 +51,11 @@ def load_known_face_encodings() -> Tuple[List[np.ndarray], List[str]]:
     ]
     
     if not image_files:
+        logger.error(f"Không tìm thấy ảnh hợp lệ nào trong thư mục '{myface_dir}/'")
         raise ValueError(f"Không tìm thấy ảnh hợp lệ nào trong thư mục '{myface_dir}/'. "
                         f"Vui lòng thêm ảnh với định dạng .jpg, .jpeg, hoặc .png")
+    
+    logger.info(f"Tìm thấy {len(image_files)} file ảnh: {image_files}")
     
     # Xử lý từng ảnh
     for filename in image_files:
@@ -61,10 +70,10 @@ def load_known_face_encodings() -> Tuple[List[np.ndarray], List[str]]:
             
             # Bỏ qua ảnh nếu không có hoặc có nhiều hơn 1 khuôn mặt
             if len(face_locations) == 0:
-                print(f"Cảnh báo: Không tìm thấy khuôn mặt trong '{filename}'. Bỏ qua.")
+                logger.warning(f"Không tìm thấy khuôn mặt trong '{filename}'. Bỏ qua.")
                 continue
             elif len(face_locations) > 1:
-                print(f"Cảnh báo: Phát hiện {len(face_locations)} khuôn mặt trong '{filename}'. Bỏ qua.")
+                logger.warning(f"Phát hiện {len(face_locations)} khuôn mặt trong '{filename}'. Bỏ qua.")
                 continue
             
             # Trích xuất face embedding
@@ -73,18 +82,19 @@ def load_known_face_encodings() -> Tuple[List[np.ndarray], List[str]]:
             if len(face_encodings) > 0:
                 known_encodings.append(face_encodings[0])
                 used_files.append(filename)
-                print(f"Đã tải thành công: {filename}")
+                logger.info(f"Đã tải thành công: {filename}")
             
         except Exception as e:
-            print(f"Lỗi khi xử lý '{filename}': {str(e)}. Bỏ qua.")
+            logger.error(f"Lỗi khi xử lý '{filename}': {str(e)}. Bỏ qua.")
             continue
     
     # Kiểm tra có ít nhất 1 ảnh hợp lệ
     if len(known_encodings) == 0:
+        logger.error(f"Không thể trích xuất face embedding từ bất kỳ ảnh nào trong '{myface_dir}/'")
         raise ValueError(f"Không thể trích xuất face embedding từ bất kỳ ảnh nào trong '{myface_dir}/'. "
                         f"Đảm bảo mỗi ảnh chứa đúng một khuôn mặt rõ ràng.")
     
-    print(f"Đã tải {len(known_encodings)} ảnh huấn luyện thành công.")
+    logger.info(f"Đã tải {len(known_encodings)} ảnh huấn luyện thành công.")
     return known_encodings, used_files
 
 

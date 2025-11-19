@@ -8,6 +8,38 @@ import cv2
 import face_recognition
 from typing import Tuple, List
 
+# Magic bytes cho các định dạng ảnh
+IMAGE_MAGIC_BYTES = {
+    'jpeg': [b'\xFF\xD8\xFF'],  # JPEG
+    'png': [b'\x89\x50\x4E\x47\x0D\x0A\x1A\x0A'],  # PNG
+}
+
+
+def validate_image_magic_bytes(file_bytes: bytes) -> bool:
+    """
+    Kiểm tra file có phải là ảnh hợp lệ bằng cách kiểm tra magic bytes.
+    
+    Args:
+        file_bytes: Dữ liệu file dạng bytes
+        
+    Returns:
+        True nếu file là ảnh hợp lệ (JPEG hoặc PNG), False nếu không
+    """
+    if not file_bytes or len(file_bytes) < 8:
+        return False
+    
+    # Kiểm tra JPEG magic bytes
+    for magic in IMAGE_MAGIC_BYTES['jpeg']:
+        if file_bytes.startswith(magic):
+            return True
+    
+    # Kiểm tra PNG magic bytes
+    for magic in IMAGE_MAGIC_BYTES['png']:
+        if file_bytes.startswith(magic):
+            return True
+    
+    return False
+
 
 def read_image_from_upload(file_bytes: bytes) -> np.ndarray:
     """
