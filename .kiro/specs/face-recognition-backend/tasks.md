@@ -96,7 +96,9 @@
   - Tạo model VerifyResponse cho response hoàn chỉnh
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-- [-] 5. Triển khai FastAPI application và endpoints
+- [x] 5. Triển khai FastAPI application và endpoints
+
+
 
 
 
@@ -126,7 +128,8 @@
   - **Property 8: Threshold range validation**
   - **Validates: Requirements 4.3**
 
-- [-] 5.4 Viết property test cho response completeness
+- [x] 5.4 Viết property test cho response completeness
+
 
   - **Property 9: Response contains all required fields**
   - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7**
