@@ -84,7 +84,12 @@
   - Test xử lý ảnh có nhiều khuôn mặt
   - _Requirements: 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 4. Triển khai Pydantic models
+- [x] 4. Triển khai Pydantic models
+
+
+
+
+
   - Tạo model FaceBox cho tọa độ khuôn mặt
   - Tạo model ImageSize cho kích thước ảnh
   - Tạo model TrainingInfo cho thông tin huấn luyện
