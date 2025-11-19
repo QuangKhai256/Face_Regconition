@@ -9,16 +9,28 @@ from fastapi.exceptions import RequestValidationError
 import cv2
 import numpy as np
 import logging
+import os
+from datetime import datetime
 from typing import Dict
 
-from backend.models import VerifyResponse, FaceBox, ImageSize, TrainingInfo
+from backend.models import (
+    VerifyResponse, 
+    FaceBox, 
+    ImageSize, 
+    TrainingInfo,
+    CollectResponse,
+    EnvironmentInfo,
+    TrainResponse
+)
 from backend.data_loader import get_known_faces_cache
 from backend.face_processor import (
     read_image_from_upload,
     extract_single_face_encoding,
     compare_with_known_faces,
-    validate_image_magic_bytes
+    validate_image_magic_bytes,
+    analyze_environment
 )
+from backend.training import train_personal_model
 from backend.exceptions import (
     file_not_found_handler,
     value_error_handler,
@@ -69,12 +81,24 @@ app.add_exception_handler(Exception, generic_exception_handler)
 async def startup_event():
     """
     Khởi tạo hệ thống khi startup.
-    Tải dữ liệu huấn luyện vào cache.
+    Tạo thư mục cần thiết và tải dữ liệu huấn luyện vào cache.
+    Validates: Requirements 7.1, 7.2
     """
     try:
         logger.info("Đang khởi động Face Recognition Backend...")
-        known_encodings, used_files = get_known_faces_cache()
-        logger.info(f"Đã tải {len(known_encodings)} ảnh huấn luyện thành công: {used_files}")
+        
+        # Tạo thư mục cần thiết
+        os.makedirs("data/raw/user", exist_ok=True)
+        os.makedirs("models", exist_ok=True)
+        logger.info("Đã tạo thư mục data/raw/user và models")
+        
+        # Tải dữ liệu huấn luyện vào cache (nếu có)
+        try:
+            known_encodings, used_files = get_known_faces_cache()
+            logger.info(f"Đã tải {len(known_encodings)} ảnh huấn luyện thành công: {used_files}")
+        except (FileNotFoundError, ValueError) as e:
+            logger.warning(f"Chưa có dữ liệu huấn luyện: {str(e)}")
+        
         logger.info("Hệ thống sẵn sàng nhận request.")
     except Exception as e:
         logger.error(f"Lỗi khi khởi động hệ thống: {str(e)}")
@@ -89,6 +113,179 @@ async def health_check():
     """
     logger.debug("Health check request received")
     return {"status": "ok"}
+
+
+@app.post("/api/v1/collect", response_model=CollectResponse)
+async def collect_face_image(
+    file: UploadFile = File(...)
+):
+    """
+    Endpoint thu thập dữ liệu khuôn mặt với kiểm tra môi trường.
+    
+    Args:
+        file: File ảnh upload (jpg, jpeg, png)
+        
+    Returns:
+        CollectResponse: Kết quả thu thập với thông tin môi trường
+        
+    Validates: Requirements 1.1-1.11, 4.1-4.6, 7.3
+    """
+    logger.info(f"Nhận request thu thập dữ liệu: filename={file.filename}, content_type={file.content_type}")
+    
+    # Validation content-type
+    valid_content_types = {"image/jpeg", "image/jpg", "image/png"}
+    if file.content_type not in valid_content_types:
+        logger.warning(f"Content-type không hợp lệ: {file.content_type}")
+        raise HTTPException(
+            status_code=400,
+            detail="File upload phải là ảnh (.jpg, .jpeg, .png)."
+        )
+    
+    # Đọc file bytes
+    file_bytes = await file.read()
+    file_size = len(file_bytes)
+    
+    # Kiểm tra kích thước file (max 10MB)
+    if file_size > MAX_FILE_SIZE:
+        logger.warning(f"File quá lớn: {file_size} bytes (max: {MAX_FILE_SIZE} bytes)")
+        raise HTTPException(
+            status_code=400,
+            detail=f"File quá lớn. Kích thước tối đa cho phép là {MAX_FILE_SIZE // (1024*1024)}MB."
+        )
+    
+    logger.info(f"Kích thước file: {file_size} bytes")
+    
+    # Validation bằng magic bytes
+    if not validate_image_magic_bytes(file_bytes):
+        logger.warning("File không phải là ảnh hợp lệ (magic bytes validation failed)")
+        raise HTTPException(
+            status_code=400,
+            detail="File không phải là ảnh hợp lệ. Vui lòng upload file ảnh thật (.jpg, .jpeg, .png)."
+        )
+    
+    # Chuyển đổi bytes thành ảnh BGR
+    logger.info("Đang đọc và decode ảnh...")
+    image_bgr = read_image_from_upload(file_bytes)
+    
+    # Chuyển đổi BGR sang RGB (face_recognition yêu cầu RGB)
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+    
+    # Trích xuất face embedding và location
+    logger.info("Đang trích xuất face embedding...")
+    unknown_encoding, face_location = extract_single_face_encoding(image_rgb)
+    logger.info(f"Đã trích xuất face embedding thành công. Face location: {face_location}")
+    
+    # Phân tích môi trường
+    logger.info("Đang phân tích môi trường...")
+    env_info = analyze_environment(image_bgr, face_location)
+    logger.info(f"Kết quả phân tích môi trường: brightness={env_info['brightness']:.1f}, "
+                f"blur_score={env_info['blur_score']:.1f}, "
+                f"face_size_ratio={env_info['face_size_ratio']:.3f}")
+    
+    # Kiểm tra môi trường có đạt yêu cầu không
+    # Từ chối nếu quá tối, quá mờ, hoặc khuôn mặt quá nhỏ
+    if env_info['is_too_dark'] or env_info['is_too_blurry'] or env_info['is_face_too_small']:
+        logger.warning(f"Môi trường không đạt yêu cầu. Warnings: {env_info['warnings']}")
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": "Môi trường không đạt yêu cầu để thu thập dữ liệu.",
+                "environment_info": env_info
+            }
+        )
+    
+    # Môi trường tốt - lưu ảnh
+    # Tạo thư mục nếu chưa tồn tại
+    data_dir = "data/raw/user"
+    os.makedirs(data_dir, exist_ok=True)
+    
+    # Tạo tên file với timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"user_{timestamp}.jpg"
+    filepath = os.path.join(data_dir, filename)
+    
+    # Lưu ảnh
+    cv2.imwrite(filepath, image_bgr)
+    logger.info(f"Đã lưu ảnh thành công: {filepath}")
+    
+    # Đếm tổng số ảnh đã thu thập
+    image_files = [
+        f for f in os.listdir(data_dir)
+        if os.path.isfile(os.path.join(data_dir, f)) and
+        f.lower().endswith(('.jpg', '.jpeg', '.png'))
+    ]
+    total_images = len(image_files)
+    
+    # Tạo response
+    response = CollectResponse(
+        message=f"Đã thu thập ảnh thành công! Tổng số ảnh: {total_images}",
+        saved_path=filepath,
+        total_images=total_images,
+        environment_info=EnvironmentInfo(**env_info)
+    )
+    
+    logger.info(f"Thu thập hoàn tất thành công. Tổng số ảnh: {total_images}")
+    return response
+
+
+@app.post("/api/v1/train", response_model=TrainResponse)
+async def train_model_endpoint():
+    """
+    Endpoint huấn luyện mô hình cá nhân từ dữ liệu đã thu thập.
+    
+    Returns:
+        TrainResponse: Kết quả huấn luyện với số lượng ảnh và embeddings
+        
+    Validates: Requirements 2.1, 2.2, 2.8
+    """
+    logger.info("Nhận request huấn luyện mô hình")
+    
+    # Kiểm tra thư mục data/raw/user/ tồn tại và không rỗng
+    data_dir = "data/raw/user"
+    
+    if not os.path.exists(data_dir) or not os.path.isdir(data_dir):
+        logger.error(f"Thư mục '{data_dir}/' không tồn tại")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Thư mục '{data_dir}/' không tồn tại. Vui lòng thu thập ảnh trước khi huấn luyện."
+        )
+    
+    # Kiểm tra thư mục có ảnh không
+    valid_extensions = {'.jpg', '.jpeg', '.png'}
+    image_files = [
+        f for f in os.listdir(data_dir)
+        if os.path.isfile(os.path.join(data_dir, f)) and
+        os.path.splitext(f.lower())[1] in valid_extensions
+    ]
+    
+    if len(image_files) == 0:
+        logger.error(f"Không tìm thấy ảnh nào trong thư mục '{data_dir}/'")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Không tìm thấy ảnh nào trong thư mục '{data_dir}/'. Vui lòng thu thập ảnh trước khi huấn luyện."
+        )
+    
+    logger.info(f"Tìm thấy {len(image_files)} ảnh trong thư mục '{data_dir}/'")
+    
+    # Gọi hàm huấn luyện
+    # FileNotFoundError và ValueError sẽ được xử lý bởi exception handlers
+    try:
+        num_images, num_embeddings = train_personal_model()
+        
+        # Tạo response
+        response = TrainResponse(
+            message=f"Huấn luyện hoàn tất thành công! Đã sử dụng {num_embeddings}/{num_images} ảnh.",
+            num_images=num_images,
+            num_embeddings=num_embeddings
+        )
+        
+        logger.info(f"Huấn luyện hoàn tất: {num_images} ảnh, {num_embeddings} embeddings")
+        return response
+        
+    except (FileNotFoundError, ValueError) as e:
+        # Re-raise để exception handler xử lý
+        logger.error(f"Lỗi khi huấn luyện: {str(e)}")
+        raise
 
 
 @app.post("/api/v1/face/verify", response_model=VerifyResponse)

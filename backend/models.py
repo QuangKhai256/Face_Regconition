@@ -35,6 +35,42 @@ class TrainingInfo(BaseModel):
     used_files_sample: List[str]
 
 
+class EnvironmentInfo(BaseModel):
+    """
+    Thông tin về môi trường xung quanh ảnh.
+    Validates: Requirements 1.11, 2.8, 3.8, 3.9
+    """
+    brightness: float
+    is_too_dark: bool
+    is_too_bright: bool
+    blur_score: float
+    is_too_blurry: bool
+    face_size_ratio: float
+    is_face_too_small: bool
+    warnings: List[str]
+
+
+class CollectResponse(BaseModel):
+    """
+    Response cho API thu thập dữ liệu khuôn mặt.
+    Validates: Requirements 1.11
+    """
+    message: str
+    saved_path: str
+    total_images: int
+    environment_info: EnvironmentInfo
+
+
+class TrainResponse(BaseModel):
+    """
+    Response cho API huấn luyện mô hình.
+    Validates: Requirements 2.8
+    """
+    message: str
+    num_images: int
+    num_embeddings: int
+
+
 class VerifyResponse(BaseModel):
     """
     Response hoàn chỉnh cho API xác thực khuôn mặt.
