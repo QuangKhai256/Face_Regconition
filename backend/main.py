@@ -5,6 +5,7 @@ Main application file containing REST API endpoints for face recognition
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 import cv2
 import numpy as np
 
@@ -14,6 +15,13 @@ from backend.face_processor import (
     read_image_from_upload,
     extract_single_face_encoding,
     compare_with_known_faces
+)
+from backend.exceptions import (
+    file_not_found_handler,
+    value_error_handler,
+    generic_exception_handler,
+    http_exception_handler,
+    validation_exception_handler
 )
 
 
@@ -34,6 +42,14 @@ app.add_middleware(
     allow_methods=["*"],  # Cho phép tất cả HTTP methods
     allow_headers=["*"],  # Cho phép tất cả headers
 )
+
+# Đăng ký exception handlers
+# Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5, 7.1, 7.2, 7.3, 7.4
+app.add_exception_handler(FileNotFoundError, file_not_found_handler)
+app.add_exception_handler(ValueError, value_error_handler)
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
 
 
 @app.get("/api/v1/health")
@@ -70,76 +86,68 @@ async def verify_face(
             detail="File upload phải là ảnh (.jpg, .jpeg, .png)."
         )
     
-    try:
-        # Đọc file bytes
-        file_bytes = await file.read()
-        
-        # Chuyển đổi bytes thành ảnh BGR
-        image_bgr = read_image_from_upload(file_bytes)
-        
-        # Lấy kích thước ảnh
-        height, width = image_bgr.shape[:2]
-        
-        # Chuyển đổi BGR sang RGB (face_recognition yêu cầu RGB)
-        image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-        
-        # Trích xuất face embedding và location
-        unknown_encoding, face_location = extract_single_face_encoding(image_rgb)
-        
-        # Lấy dữ liệu huấn luyện từ cache
-        known_encodings, used_files = get_known_faces_cache()
-        
-        # So sánh với dữ liệu đã học
-        is_match, best_distance = compare_with_known_faces(
-            unknown_encoding,
-            known_encodings,
-            threshold
+    # Đọc file bytes
+    file_bytes = await file.read()
+    
+    # Chuyển đổi bytes thành ảnh BGR
+    # ValueError will be caught by exception handler
+    image_bgr = read_image_from_upload(file_bytes)
+    
+    # Lấy kích thước ảnh
+    height, width = image_bgr.shape[:2]
+    
+    # Chuyển đổi BGR sang RGB (face_recognition yêu cầu RGB)
+    image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
+    
+    # Trích xuất face embedding và location
+    # ValueError will be caught by exception handler
+    unknown_encoding, face_location = extract_single_face_encoding(image_rgb)
+    
+    # Lấy dữ liệu huấn luyện từ cache
+    # FileNotFoundError will be caught by exception handler
+    known_encodings, used_files = get_known_faces_cache()
+    
+    # So sánh với dữ liệu đã học
+    is_match, best_distance = compare_with_known_faces(
+        unknown_encoding,
+        known_encodings,
+        threshold
+    )
+    
+    # Tạo message bằng tiếng Việt
+    if is_match:
+        message = (
+            f"Đây là KHUÔN MẶT CỦA BẠN "
+            f"(khoảng cách = {best_distance:.3f} ≤ ngưỡng {threshold:.3f})."
         )
-        
-        # Tạo message bằng tiếng Việt
-        if is_match:
-            message = (
-                f"Đây là KHUÔN MẶT CỦA BẠN "
-                f"(khoảng cách = {best_distance:.3f} ≤ ngưỡng {threshold:.3f})."
-            )
-        else:
-            message = (
-                f"Đây KHÔNG PHẢI khuôn mặt của bạn "
-                f"(khoảng cách = {best_distance:.3f} > ngưỡng {threshold:.3f})."
-            )
-        
-        # Tạo response
-        top, right, bottom, left = face_location
-        
-        response = VerifyResponse(
-            is_match=is_match,
-            distance=round(best_distance, 3),
-            threshold=threshold,
-            message=message,
-            face_box=FaceBox(
-                top=top,
-                right=right,
-                bottom=bottom,
-                left=left
-            ),
-            image_size=ImageSize(
-                width=width,
-                height=height
-            ),
-            training_info=TrainingInfo(
-                num_images=len(used_files),
-                used_files_sample=used_files[:10]  # Chỉ lấy 10 file đầu tiên
-            )
+    else:
+        message = (
+            f"Đây KHÔNG PHẢI khuôn mặt của bạn "
+            f"(khoảng cách = {best_distance:.3f} > ngưỡng {threshold:.3f})."
         )
-        
-        return response
-        
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Lỗi nội bộ: {str(e)}"
+    
+    # Tạo response
+    top, right, bottom, left = face_location
+    
+    response = VerifyResponse(
+        is_match=is_match,
+        distance=round(best_distance, 3),
+        threshold=threshold,
+        message=message,
+        face_box=FaceBox(
+            top=top,
+            right=right,
+            bottom=bottom,
+            left=left
+        ),
+        image_size=ImageSize(
+            width=width,
+            height=height
+        ),
+        training_info=TrainingInfo(
+            num_images=len(used_files),
+            used_files_sample=used_files[:10]  # Chỉ lấy 10 file đầu tiên
         )
+    )
+    
+    return response

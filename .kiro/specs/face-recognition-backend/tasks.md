@@ -151,7 +151,14 @@
   - Test CORS preflight request
   - _Requirements: 2.1, 4.2, 8.2_
 
-- [ ] 6. Triển khai xử lý lỗi và exception handling
+- [x] 6. Triển khai xử lý lỗi và exception handling
+
+
+
+
+
+
+
   - Implement custom exception handlers cho FastAPI
   - Implement xử lý FileNotFoundError với HTTP 500
   - Implement xử lý ValueError với HTTP 400
@@ -160,15 +167,21 @@
   - Viết thông báo lỗi bằng tiếng Việt
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 6.1 Viết property test cho error response format
+- [x] 6.1 Viết property test cho error response format
+
+
   - **Property 10: Error responses use JSON format**
   - **Validates: Requirements 7.3**
 
-- [ ] 6.2 Viết property test cho exception handling
+- [x] 6.2 Viết property test cho exception handling
+
+
   - **Property 11: Exception handling prevents crashes**
   - **Validates: Requirements 7.4**
 
-- [ ] 6.3 Viết unit tests cho error handling
+- [x] 6.3 Viết unit tests cho error handling
+
+
   - Test xử lý thư mục myface/ không tồn tại
   - Test xử lý thư mục myface/ rỗng
   - Test xử lý file upload không hợp lệ
