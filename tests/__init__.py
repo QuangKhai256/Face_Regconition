@@ -1,1 +1,1 @@
-# Test package
+# Face Recognition Tests Package
