@@ -34,17 +34,28 @@
   - **Property 3: Environment threshold consistency**
   - **Validates: Requirements 1.5, 1.6, 1.7, 1.8**
 
-- [ ] 3. Implement Backend - Face Processing Module
+- [x] 3. Implement Backend - Face Processing Module
+
+
+
+
+
+
+
   - Viết hàm `load_image_bgr_from_bytes(file_bytes)` để decode image từ bytes
   - Viết hàm `extract_single_face_embedding(image_rgb)` để detect face và extract embedding
   - Validate đúng 1 khuôn mặt, raise ValueError nếu 0 hoặc nhiều hơn 1
   - _Requirements: 1.1, 1.2, 1.3, 2.3, 3.3_
 
-- [ ] 3.1 Write property test for single face detection
+- [x] 3.1 Write property test for single face detection
+
+
   - **Property 1: Single face detection validation**
   - **Validates: Requirements 1.1**
 
-- [ ] 3.2 Write property test for embedding dimensions
+- [x] 3.2 Write property test for embedding dimensions
+
+
   - **Property 7: Training extracts 128-d embeddings**
   - **Validates: Requirements 2.3**
 

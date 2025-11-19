@@ -41,9 +41,9 @@ def validate_image_magic_bytes(file_bytes: bytes) -> bool:
     return False
 
 
-def read_image_from_upload(file_bytes: bytes) -> np.ndarray:
+def load_image_bgr_from_bytes(file_bytes: bytes) -> np.ndarray:
     """
-    Chuyển đổi bytes từ upload thành numpy array (BGR format).
+    Decode image từ bytes thành numpy array (BGR format).
     
     Args:
         file_bytes: Dữ liệu ảnh dạng bytes
@@ -53,6 +53,8 @@ def read_image_from_upload(file_bytes: bytes) -> np.ndarray:
         
     Raises:
         ValueError: Nếu không đọc được ảnh
+        
+    Validates: Requirements 1.1, 1.2, 1.3, 2.3, 3.3
     """
     try:
         # Chuyển bytes thành numpy array
@@ -70,26 +72,45 @@ def read_image_from_upload(file_bytes: bytes) -> np.ndarray:
         raise ValueError(f"Không đọc được ảnh từ dữ liệu upload: {str(e)}")
 
 
-def extract_single_face_encoding(
+def read_image_from_upload(file_bytes: bytes) -> np.ndarray:
+    """
+    Chuyển đổi bytes từ upload thành numpy array (BGR format).
+    Alias for load_image_bgr_from_bytes for backward compatibility.
+    
+    Args:
+        file_bytes: Dữ liệu ảnh dạng bytes
+        
+    Returns:
+        image_bgr: Ảnh dạng numpy array (BGR)
+        
+    Raises:
+        ValueError: Nếu không đọc được ảnh
+    """
+    return load_image_bgr_from_bytes(file_bytes)
+
+
+def extract_single_face_embedding(
     image_rgb: np.ndarray
 ) -> Tuple[np.ndarray, Tuple[int, int, int, int]]:
     """
-    Trích xuất face embedding từ ảnh chứa đúng 1 khuôn mặt.
+    Detect face và extract embedding từ ảnh chứa đúng 1 khuôn mặt.
     
     Args:
         image_rgb: Ảnh dạng RGB numpy array
         
     Returns:
-        - encoding: Face embedding (128-d vector)
+        - embedding: Face embedding (128-d vector)
         - location: Tọa độ khuôn mặt (top, right, bottom, left)
         
     Raises:
         ValueError: Nếu không có hoặc có nhiều hơn 1 khuôn mặt
+        
+    Validates: Requirements 1.1, 1.2, 1.3, 2.3, 3.3
     """
     # Tìm vị trí khuôn mặt
     face_locations = face_recognition.face_locations(image_rgb)
     
-    # Validate số lượng khuôn mặt
+    # Validate số lượng khuôn mặt - đúng 1 khuôn mặt
     if len(face_locations) == 0:
         raise ValueError(
             "Không tìm thấy khuôn mặt nào trong ảnh. "
@@ -112,6 +133,26 @@ def extract_single_face_encoding(
         )
     
     return face_encodings[0], face_locations[0]
+
+
+def extract_single_face_encoding(
+    image_rgb: np.ndarray
+) -> Tuple[np.ndarray, Tuple[int, int, int, int]]:
+    """
+    Trích xuất face embedding từ ảnh chứa đúng 1 khuôn mặt.
+    Alias for extract_single_face_embedding for backward compatibility.
+    
+    Args:
+        image_rgb: Ảnh dạng RGB numpy array
+        
+    Returns:
+        - encoding: Face embedding (128-d vector)
+        - location: Tọa độ khuôn mặt (top, right, bottom, left)
+        
+    Raises:
+        ValueError: Nếu không có hoặc có nhiều hơn 1 khuôn mặt
+    """
+    return extract_single_face_embedding(image_rgb)
 
 
 def compare_with_known_faces(

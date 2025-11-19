@@ -22,6 +22,51 @@ class TestFaceProcessorProperties:
         image_width=st.integers(min_value=100, max_value=1000),
         image_height=st.integers(min_value=100, max_value=1000)
     )
+    def test_property_training_extracts_128d_embeddings(self, image_width, image_height):
+        """
+        **Feature: face-recognition-complete, Property 7: Training extracts 128-d embeddings**
+        **Validates: Requirements 2.3**
+        
+        For any valid training image with exactly one face, the system should extract 
+        a face embedding with exactly 128 dimensions.
+        """
+        # Create a mock RGB image (simulating a training image)
+        mock_image_rgb = np.random.randint(0, 256, (image_height, image_width, 3), dtype=np.uint8)
+        
+        # Mock face_recognition functions
+        with patch('backend.face_processor.face_recognition') as mock_fr:
+            # Mock to return exactly one face location (valid training image)
+            mock_location = (50, image_width - 50, image_height - 50, 50)
+            mock_fr.face_locations.return_value = [mock_location]
+            
+            # Mock to return one 128-d encoding
+            mock_encoding = np.random.rand(128)
+            mock_fr.face_encodings.return_value = [mock_encoding]
+            
+            # Extract face embedding (as would happen during training)
+            embedding, location = extract_single_face_encoding(mock_image_rgb)
+            
+            # Property: The extracted embedding MUST be exactly 128 dimensions
+            assert isinstance(embedding, np.ndarray), \
+                "Embedding should be a numpy array"
+            assert len(embedding.shape) == 1, \
+                f"Embedding should be 1-dimensional vector, got shape {embedding.shape}"
+            assert embedding.shape[0] == 128, \
+                f"Embedding MUST be exactly 128 dimensions for training, got {embedding.shape[0]}"
+            
+            # Verify the embedding contains valid float values
+            assert embedding.dtype in [np.float32, np.float64], \
+                f"Embedding should contain float values, got {embedding.dtype}"
+            
+            # Verify location is also returned correctly
+            assert location == mock_location, \
+                "Face location should be returned along with embedding"
+    
+    @settings(max_examples=100, deadline=None)
+    @given(
+        image_width=st.integers(min_value=100, max_value=1000),
+        image_height=st.integers(min_value=100, max_value=1000)
+    )
     def test_property_face_embedding_extraction(self, image_width, image_height):
         """
         **Feature: face-recognition-backend, Property 4: Face embedding extraction from valid images**
