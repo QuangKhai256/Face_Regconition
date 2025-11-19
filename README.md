@@ -1,15 +1,17 @@
-# Face Recognition Backend API
+# Face Recognition Complete System
 
-Backend Python cho hệ thống nhận diện khuôn mặt cá nhân, cung cấp REST API để xác thực danh tính người dùng thông qua hình ảnh khuôn mặt.
+Hệ thống nhận diện khuôn mặt cá nhân hoàn chỉnh với ba giai đoạn: thu thập dữ liệu, huấn luyện mô hình, và nhận diện khuôn mặt. Bao gồm Backend API (FastAPI), Frontend Web (Streamlit), và Mobile App (Flutter).
 
 ## Tính năng
 
+- ✅ **Thu thập dữ liệu** với kiểm tra môi trường tự động (độ sáng, độ mờ, kích thước mặt)
+- ✅ **Huấn luyện mô hình** cá nhân từ dữ liệu đã thu thập
+- ✅ **Nhận diện khuôn mặt** với threshold tùy chỉnh
 - ✅ REST API với FastAPI
-- ✅ Nhận diện khuôn mặt sử dụng face_recognition library
+- ✅ Frontend Web với Streamlit
+- ✅ Mobile App với Flutter
 - ✅ Hỗ trợ CORS cho web và mobile
 - ✅ Xử lý lỗi chi tiết bằng tiếng Việt
-- ✅ Caching dữ liệu huấn luyện
-- ✅ Threshold tùy chỉnh
 - ✅ Response JSON đầy đủ thông tin
 
 ## 📚 Tài liệu Hướng dẫn
@@ -90,7 +92,64 @@ GET /api/v1/health
 }
 ```
 
-#### 2. Face Verification
+#### 2. Thu thập Dữ liệu (Collection)
+```
+POST /api/v1/collect
+Content-Type: multipart/form-data
+Body: file (image file)
+```
+
+**Parameters:**
+- `file` (required): File ảnh (JPG, JPEG, PNG)
+
+**Response (Success):**
+```json
+{
+  "message": "Ảnh đã được lưu thành công",
+  "saved_path": "data/raw/user/user_20251119_143052.jpg",
+  "total_images": 5,
+  "environment_info": {
+    "brightness": 145.5,
+    "is_too_dark": false,
+    "is_too_bright": false,
+    "blur_score": 250.3,
+    "is_too_blurry": false,
+    "face_size_ratio": 0.25,
+    "is_face_too_small": false,
+    "warnings": []
+  }
+}
+```
+
+**Response (Poor Environment - HTTP 400):**
+```json
+{
+  "detail": "Môi trường không đạt yêu cầu: Ảnh quá tối (brightness=45.2 < 60), Ảnh quá mờ (blur_score=85.3 < 100)"
+}
+```
+
+#### 3. Huấn luyện Mô hình (Training)
+```
+POST /api/v1/train
+```
+
+**Response (Success):**
+```json
+{
+  "message": "Huấn luyện thành công",
+  "num_images": 10,
+  "num_embeddings": 10
+}
+```
+
+**Response (Error - HTTP 400):**
+```json
+{
+  "detail": "Thư mục data/raw/user/ không tồn tại hoặc rỗng. Vui lòng thu thập ảnh trước."
+}
+```
+
+#### 4. Nhận diện Khuôn mặt (Verification)
 ```
 POST /api/v1/face/verify?threshold=0.5
 Content-Type: multipart/form-data
@@ -118,9 +177,15 @@ Body: file (image file)
     "width": 640,
     "height": 480
   },
-  "training_info": {
-    "num_images": 7,
-    "used_files_sample": ["front_1.jpg", "front_2.jpg", ...]
+  "environment_info": {
+    "brightness": 145.5,
+    "is_too_dark": false,
+    "is_too_bright": false,
+    "blur_score": 250.3,
+    "is_too_blurry": false,
+    "face_size_ratio": 0.25,
+    "is_face_too_small": false,
+    "warnings": []
   }
 }
 ```
@@ -205,44 +270,159 @@ pytest --cov=backend tests/
 
 ```
 Face_Regconition/
-├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── data_loader.py       # Load training data
-│   ├── face_processor.py    # Face recognition logic
-│   ├── models.py            # Pydantic models
-│   └── exceptions.py        # Exception handlers
-├── tests/
-│   ├── test_integration_e2e.py    # Integration tests
-│   ├── test_api_*.py              # API tests
-│   ├── test_data_loader_*.py     # Data loader tests
-│   └── test_face_processor_*.py  # Face processor tests
-├── myface/                  # Training images directory
-│   └── README.md           # Hướng dẫn chuẩn bị ảnh
+├── backend/                 # Backend API (FastAPI)
+│   ├── main.py             # FastAPI application & endpoints
+│   ├── data_loader.py      # Load training data (legacy)
+│   ├── face_processor.py   # Face recognition & environment analysis
+│   ├── training.py         # Training module
+│   ├── verification.py     # Verification module
+│   ├── models.py           # Pydantic models
+│   └── exceptions.py       # Exception handlers
+├── web/                    # Frontend Web (Streamlit)
+│   └── web_app.py          # Streamlit application
+├── mobile/                 # Mobile App (Flutter)
+│   ├── lib/
+│   │   └── main.dart       # Flutter main application
+│   ├── android/            # Android configuration
+│   └── pubspec.yaml        # Flutter dependencies
+├── data/                   # Data directory
+│   └── raw/
+│       └── user/           # Collected training images
+├── models/                 # Trained models
+│   ├── user_embeddings.npy      # All embeddings
+│   └── user_embedding_mean.npy  # Mean embedding
+├── tests/                  # Test suite
+│   ├── test_integration_*.py    # Integration tests
+│   ├── test_*_property.py       # Property-based tests
+│   └── test_*_unit.py           # Unit tests
 ├── .kiro/specs/            # Specification documents
+│   └── face-recognition-complete/
+│       ├── requirements.md  # Requirements document
+│       ├── design.md        # Design document
+│       └── tasks.md         # Implementation tasks
 ├── requirements.txt        # Python dependencies
-├── test_api_manual.py     # Manual testing script
-├── TESTING_GUIDE.md       # Hướng dẫn test chi tiết
 └── README.md              # This file
 ```
 
-## Cách Sử dụng
+## Chạy Các Thành phần
 
-### 1. Chuẩn bị Ảnh Huấn luyện
-- Thêm 5-7 ảnh của bạn vào `myface/`
-- Đảm bảo mỗi ảnh chỉ có 1 khuôn mặt
-- Đa dạng góc chụp và điều kiện ánh sáng
-
-### 2. Khởi động Backend
+### Backend API
 ```bash
-uvicorn backend.main:app --reload
+# Development mode (auto-reload)
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+
+# Production mode
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
-### 3. Test API
-- Sử dụng Postman, cURL, hoặc script Python
-- Upload ảnh của bạn → should match
-- Upload ảnh người khác → should not match
+### Frontend Web (Streamlit)
+```bash
+# Cài đặt dependencies
+pip install streamlit requests opencv-python
 
-### 4. Tích hợp vào Ứng dụng
+# Chạy web app
+streamlit run web/web_app.py
+```
+
+Web app sẽ mở tại: http://localhost:8501
+
+### Mobile App (Flutter)
+```bash
+# Di chuyển vào thư mục mobile
+cd mobile
+
+# Cài đặt dependencies
+flutter pub get
+
+# Chạy trên emulator/device
+flutter run
+
+# Build APK (Android)
+flutter build apk
+
+# Build iOS
+flutter build ios
+```
+
+**Lưu ý cho Mobile:**
+- Cấu hình địa chỉ Backend trong `mobile/lib/main.dart`
+- Android emulator: `http://10.0.2.2:8000`
+- iOS simulator: `http://localhost:8000`
+- Thiết bị thật: `http://YOUR_COMPUTER_IP:8000`
+
+## Cách Sử dụng
+
+### Quy trình Hoàn chỉnh
+
+#### 1. Khởi động Backend
+```bash
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Backend sẽ chạy tại: http://localhost:8000
+
+#### 2. Thu thập Dữ liệu (Collection Phase)
+Thu thập 5-10 ảnh khuôn mặt của bạn:
+
+**Sử dụng Frontend Web:**
+```bash
+streamlit run web/web_app.py
+```
+- Mở tab "Thu thập dữ liệu"
+- Chụp hoặc upload ảnh
+- Hệ thống sẽ kiểm tra chất lượng tự động
+
+**Sử dụng API trực tiếp:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/collect" \
+  -F "file=@path/to/your/photo.jpg"
+```
+
+**Yêu cầu ảnh:**
+- Chỉ có MỘT khuôn mặt trong mỗi ảnh
+- Độ sáng: 60-200 (không quá tối/sáng)
+- Blur score: > 100 (không quá mờ)
+- Khuôn mặt chiếm ≥ 10% khung hình
+
+#### 3. Huấn luyện Mô hình (Training Phase)
+Sau khi thu thập đủ ảnh:
+
+**Sử dụng Frontend Web:**
+- Chuyển sang tab "Huấn luyện mô hình"
+- Nhấn "Bắt đầu huấn luyện"
+
+**Sử dụng API:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/train"
+```
+
+Hệ thống sẽ:
+- Đọc tất cả ảnh từ `data/raw/user/`
+- Trích xuất face embeddings (128-d vectors)
+- Tính embedding trung bình
+- Lưu vào `models/user_embedding_mean.npy`
+
+#### 4. Nhận diện Khuôn mặt (Verification Phase)
+Sau khi huấn luyện xong:
+
+**Sử dụng Frontend Web:**
+- Chuyển sang tab "Nhận diện khuôn mặt"
+- Chụp hoặc upload ảnh cần nhận diện
+- Điều chỉnh threshold nếu cần
+
+**Sử dụng API:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/face/verify?threshold=0.5" \
+  -F "file=@path/to/verify/photo.jpg"
+```
+
+**Sử dụng Mobile App:**
+```bash
+cd mobile
+flutter run
+```
+
+### 5. Tích hợp vào Ứng dụng
 Xem phần **Ví dụ Tích hợp** bên dưới để biết cách gọi API từ JavaScript (web) và Flutter (mobile)
 
 ## Ví dụ Tích hợp
@@ -980,21 +1160,76 @@ try {
 
 ### Backend không khởi động
 - Kiểm tra Python version (>= 3.8)
-- Kiểm tra đã cài đặt dependencies
+- Kiểm tra đã cài đặt dependencies: `pip install -r requirements.txt`
 - Xem log để biết lỗi cụ thể
+- Đảm bảo port 8000 không bị chiếm bởi process khác
 
-### "Không tìm thấy ảnh hợp lệ nào"
-- Kiểm tra thư mục `myface/` có ảnh
-- Kiểm tra định dạng file (.jpg, .jpeg, .png)
-- Kiểm tra mỗi ảnh chỉ có 1 khuôn mặt
+### Thu thập dữ liệu bị từ chối
+**"Môi trường không đạt yêu cầu":**
+- **Ảnh quá tối**: Chụp ở nơi có ánh sáng tốt hơn
+- **Ảnh quá sáng**: Tránh ánh sáng trực tiếp vào mặt
+- **Ảnh quá mờ**: Giữ máy ảnh/điện thoại ổn định, không rung
+- **Khuôn mặt quá nhỏ**: Di chuyển gần camera hơn
 
-### Kết quả không chính xác
-- Thêm nhiều ảnh huấn luyện đa dạng hơn
-- Điều chỉnh threshold
-- Kiểm tra chất lượng ảnh
+**"Không tìm thấy khuôn mặt":**
+- Đảm bảo khuôn mặt rõ ràng trong khung hình
+- Không bị che khuất quá nhiều (khẩu trang, tóc, tay)
+- Ánh sáng đủ để nhìn rõ khuôn mặt
+
+**"Phát hiện nhiều khuôn mặt":**
+- Chỉ có 1 người trong khung hình
+- Tránh ảnh có người khác ở phía sau
+
+### Huấn luyện thất bại
+**"Thư mục data/raw/user/ không tồn tại hoặc rỗng":**
+- Thu thập ít nhất 5 ảnh trước khi huấn luyện
+- Kiểm tra thư mục `data/raw/user/` có tồn tại
+
+**"Không trích xuất được embedding nào":**
+- Kiểm tra lại chất lượng ảnh đã thu thập
+- Xóa ảnh kém chất lượng và thu thập lại
+
+### Nhận diện không chính xác
+**Ảnh của bạn không match:**
+- Thêm nhiều ảnh huấn luyện đa dạng hơn (5-10 ảnh)
+- Bao gồm nhiều góc độ, biểu cảm khác nhau
+- Tăng threshold (0.6-0.7)
+- Huấn luyện lại sau khi thêm ảnh
+
+**Ảnh người khác bị match nhầm:**
+- Giảm threshold (0.3-0.4)
+- Thêm ảnh huấn luyện chất lượng cao
+- Đảm bảo ảnh huấn luyện đa dạng
+
+### Frontend Web không kết nối Backend
+- Kiểm tra Backend đang chạy tại http://localhost:8000
+- Kiểm tra CORS đã được cấu hình
+- Xem console log để biết lỗi cụ thể
+
+### Mobile App không kết nối Backend
+**Android Emulator:**
+- Sử dụng `http://10.0.2.2:8000` thay vì `localhost`
+
+**iOS Simulator:**
+- Sử dụng `http://localhost:8000`
+
+**Thiết bị thật:**
+- Sử dụng địa chỉ IP LAN của máy chạy Backend
+- Ví dụ: `http://192.168.1.100:8000`
+- Đảm bảo cùng mạng WiFi
+- Tắt firewall hoặc cho phép port 8000
 
 ### Lỗi cài đặt dlib (Windows)
 Xem `INSTALLATION_NOTES.md` để biết hướng dẫn chi tiết.
+
+### Kiểm tra Log
+```bash
+# Xem log Backend
+# Log sẽ hiển thị trên terminal khi chạy uvicorn
+
+# Xem log chi tiết hơn
+uvicorn backend.main:app --reload --log-level debug
+```
 
 ## Performance
 
