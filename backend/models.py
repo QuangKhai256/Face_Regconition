@@ -74,7 +74,7 @@ class TrainResponse(BaseModel):
 class VerifyResponse(BaseModel):
     """
     Response hoàn chỉnh cho API xác thực khuôn mặt.
-    Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7
+    Validates: Requirements 3.8, 3.9, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7
     """
     is_match: bool
     distance: float
@@ -82,4 +82,5 @@ class VerifyResponse(BaseModel):
     message: str
     face_box: FaceBox
     image_size: ImageSize
+    environment_info: EnvironmentInfo
     training_info: TrainingInfo

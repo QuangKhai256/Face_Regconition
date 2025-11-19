@@ -244,26 +244,38 @@
   - **Property 13: Threshold comparison consistency**
   - **Validates: Requirements 3.6, 3.7**
 
-- [ ] 9. Implement Backend - Verification Endpoint (/api/v1/face/verify)
+- [x] 9. Implement Backend - Verification Endpoint (/api/v1/face/verify)
 
-- [ ] 9.1 Create verification endpoint structure
+
+
+
+
+- [x] 9.1 Create verification endpoint structure
+
+
   - Tạo endpoint POST /api/v1/face/verify với parameter threshold
   - Validate file upload
   - Check model file tồn tại
   - _Requirements: 3.1, 3.2_
 
-- [ ] 9.2 Implement face extraction and environment analysis
+- [x] 9.2 Implement face extraction and environment analysis
+
+
   - Extract face embedding từ ảnh mới
   - Analyze environment
   - _Requirements: 3.3, 3.4_
 
-- [ ] 9.3 Implement verification logic and response
+- [x] 9.3 Implement verification logic and response
+
+
   - Load trained model và compare embeddings
   - Calculate distance và determine is_match
   - Return response với is_match, distance, threshold, message, face_box, image_size, environment_info
   - _Requirements: 3.5, 3.6, 3.7, 3.8, 3.9_
 
-- [ ] 9.4 Write property test for verification response completeness
+- [x] 9.4 Write property test for verification response completeness
+
+
   - **Property 14: Verification response completeness**
   - **Validates: Requirements 3.8, 3.9**
 

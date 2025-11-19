@@ -31,6 +31,7 @@ from backend.face_processor import (
     analyze_environment
 )
 from backend.training import train_personal_model
+from backend.verification import load_trained_model, compare_embeddings
 from backend.exceptions import (
     file_not_found_handler,
     value_error_handler,
@@ -356,6 +357,13 @@ async def verify_face(
     unknown_encoding, face_location = extract_single_face_encoding(image_rgb)
     logger.info(f"Đã trích xuất face embedding thành công. Face location: {face_location}")
     
+    # Phân tích môi trường
+    logger.info("Đang phân tích môi trường...")
+    env_info = analyze_environment(image_bgr, face_location)
+    logger.info(f"Kết quả phân tích môi trường: brightness={env_info['brightness']:.1f}, "
+                f"blur_score={env_info['blur_score']:.1f}, "
+                f"face_size_ratio={env_info['face_size_ratio']:.3f}")
+    
     # Lấy dữ liệu huấn luyện từ cache
     # FileNotFoundError will be caught by exception handler
     known_encodings, used_files = get_known_faces_cache()
@@ -399,6 +407,7 @@ async def verify_face(
             width=width,
             height=height
         ),
+        environment_info=EnvironmentInfo(**env_info),
         training_info=TrainingInfo(
             num_images=len(used_files),
             used_files_sample=used_files[:10]  # Chỉ lấy 10 file đầu tiên
