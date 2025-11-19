@@ -212,23 +212,35 @@
   - **Property 11: Training response structure**
   - **Validates: Requirements 2.8**
 
-- [ ] 8. Implement Backend - Verification Module
+- [x] 8. Implement Backend - Verification Module
 
-- [ ] 8.1 Create model loading function
+
+
+
+
+- [x] 8.1 Create model loading function
+
+
   - Viết hàm `load_trained_model()` để load mean embedding từ file
   - Handle file not found errors
   - _Requirements: 3.1, 3.2_
 
-- [ ] 8.2 Implement embedding comparison function
+- [x] 8.2 Implement embedding comparison function
+
+
   - Viết hàm `compare_embeddings(embedding1, embedding2, threshold)` để tính Euclidean distance
   - Implement logic so sánh distance với threshold
   - _Requirements: 3.5, 3.6, 3.7_
 
-- [ ] 8.3 Write property test for Euclidean distance calculation
+- [x] 8.3 Write property test for Euclidean distance calculation
+
+
   - **Property 12: Euclidean distance calculation**
   - **Validates: Requirements 3.5**
 
-- [ ] 8.4 Write property test for threshold comparison
+- [x] 8.4 Write property test for threshold comparison
+
+
   - **Property 13: Threshold comparison consistency**
   - **Validates: Requirements 3.6, 3.7**
 
