@@ -89,7 +89,12 @@
   - **Property 17: Magic bytes validation**
   - **Validates: Requirements 4.5**
 
-- [-] 5. Implement Backend - Collection Endpoint (/api/v1/collect)
+- [x] 5. Implement Backend - Collection Endpoint (/api/v1/collect)
+
+
+
+
+
 
 
 
@@ -243,6 +248,7 @@
 
   - **Property 13: Threshold comparison consistency**
   - **Validates: Requirements 3.6, 3.7**
+- [x] 9. Implement Backend - Verification Endpoint (/api/v1/face/verify)
 
 - [x] 9. Implement Backend - Verification Endpoint (/api/v1/face/verify)
 
