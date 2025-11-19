@@ -12,7 +12,12 @@
   - Tạo file .gitignore để loại trừ các file không cần thiết
   - _Requirements: 1.1_
 
-- [ ] 2. Triển khai module Data Loader
+- [x] 2. Triển khai module Data Loader
+
+
+
+
+
   - Viết hàm load_known_face_encodings() để tải và xử lý ảnh huấn luyện
   - Implement logic quét thư mục myface/ và filter file theo extension
   - Implement logic trích xuất face embedding từ mỗi ảnh
@@ -20,15 +25,21 @@
   - Implement caching với @lru_cache decorator
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 2.1 Viết property test cho data loader
+- [x] 2.1 Viết property test cho data loader
+
+
   - **Property 1: Valid image files are loaded successfully**
   - **Validates: Requirements 1.1, 1.2**
 
-- [ ] 2.2 Viết property test cho caching behavior
+- [x] 2.2 Viết property test cho caching behavior
+
+
   - **Property 2: Face embeddings are cached**
   - **Validates: Requirements 1.4, 9.1, 9.2**
 
-- [ ] 2.3 Viết unit tests cho data loader
+- [x] 2.3 Viết unit tests cho data loader
+
+
   - Test với thư mục không tồn tại
   - Test với thư mục rỗng
   - Test với ảnh có nhiều khuôn mặt
