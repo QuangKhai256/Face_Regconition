@@ -46,7 +46,12 @@
   - Test với ảnh không có khuôn mặt
   - _Requirements: 1.3, 1.5_
 
-- [ ] 3. Triển khai module Face Processor
+- [x] 3. Triển khai module Face Processor
+
+
+
+
+
   - Viết hàm read_image_from_upload() để đọc ảnh từ bytes
   - Viết hàm extract_single_face_encoding() để trích xuất embedding
   - Viết hàm compare_with_known_faces() để so sánh khuôn mặt
@@ -54,19 +59,25 @@
   - Implement logic tính khoảng cách và so sánh với threshold
   - _Requirements: 3.2, 3.3, 3.4, 3.5, 3.6, 6.3, 6.4, 6.5_
 
-- [ ] 3.1 Viết property test cho face embedding extraction
+- [x] 3.1 Viết property test cho face embedding extraction
+
+
   - **Property 4: Face embedding extraction from valid images**
   - **Validates: Requirements 3.2**
 
-- [ ] 3.2 Viết property test cho distance comparison
+- [x] 3.2 Viết property test cho distance comparison
+
   - **Property 5: Distance comparison with all training embeddings**
   - **Validates: Requirements 3.3, 3.4**
 
-- [ ] 3.3 Viết property test cho threshold-based matching
+- [x] 3.3 Viết property test cho threshold-based matching
+
   - **Property 6: Threshold-based matching decision**
   - **Validates: Requirements 3.5, 3.6**
 
-- [ ] 3.4 Viết unit tests cho face processor
+- [x] 3.4 Viết unit tests cho face processor
+
+
   - Test đọc ảnh từ bytes hợp lệ
   - Test đọc ảnh từ bytes không hợp lệ
   - Test xử lý ảnh không có khuôn mặt
