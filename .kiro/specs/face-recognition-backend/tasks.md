@@ -199,7 +199,9 @@
 
   - Đảm bảo tất cả tests pass, hỏi người dùng nếu có vấn đề phát sinh.
 
-- [-] 8. Tạo ảnh huấn luyện mẫu và test thực tế
+- [ ] 8. Tạo ảnh huấn luyện mẫu và test thực tế
+
+
 
 
 
@@ -218,8 +220,13 @@
   - Test với nhiều ảnh khác nhau
   - Test concurrent requests
   - _Requirements: 9.3_
+-
 
-- [ ] 9. Tạo tài liệu và hướng dẫn sử dụng
+- [x] 9. Tạo tài liệu và hướng dẫn sử dụng
+
+
+
+
   - Tạo README.md với hướng dẫn cài đặt
   - Viết hướng dẫn chạy backend
   - Viết ví dụ gọi API từ JavaScript (web)
