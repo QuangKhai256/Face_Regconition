@@ -401,15 +401,23 @@
   - Configure backend URL (http://localhost:8000)
   - _Requirements: 5.1_
 
-- [ ] 14. Implement Mobile App - Setup and Core Functions
+- [x] 14. Implement Mobile App - Setup and Core Functions
 
-- [ ] 14.1 Create project setup
+
+
+
+
+
+- [x] 14.1 Create project setup
+
+
   - Tạo Flutter project structure
   - Configure pubspec.yaml với dependencies: http, image_picker
   - Setup main.dart với MaterialApp
   - _Requirements: 6.1_
 
-- [ ] 14.2 Create API client functions
+- [x] 14.2 Create API client functions
+
   - Viết hàm `_sendToCollect()` gọi POST /api/v1/collect
   - Viết hàm `_callTrain()` gọi POST /api/v1/train
   - Viết hàm `_verifyFace()` gọi POST /api/v1/face/verify
@@ -417,7 +425,8 @@
   - Handle errors và hiển thị messages
   - _Requirements: 6.4, 6.6, 6.7_
 
-- [ ] 14.3 Create image picker functions
+- [x] 14.3 Create image picker functions
+
   - Viết hàm `_pickImage(ImageSource)` để chụp hoặc chọn ảnh
   - Handle camera permission
   - Handle gallery access
