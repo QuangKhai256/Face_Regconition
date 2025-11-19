@@ -96,7 +96,10 @@
   - Tạo model VerifyResponse cho response hoàn chỉnh
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-- [ ] 5. Triển khai FastAPI application và endpoints
+- [-] 5. Triển khai FastAPI application và endpoints
+
+
+
   - Khởi tạo FastAPI app với metadata
   - Cấu hình CORS middleware
   - Implement endpoint GET /api/v1/health
@@ -105,27 +108,38 @@
   - Implement xử lý query parameter threshold với validation
   - _Requirements: 2.1, 3.1, 4.1, 4.2, 4.3, 4.4, 8.1, 8.2, 8.3_
 
-- [ ] 5.1 Viết property test cho content-type validation
+- [x] 5.1 Viết property test cho content-type validation
+
+
   - **Property 3: Content-type validation**
   - **Validates: Requirements 3.1**
 
-- [ ] 5.2 Viết property test cho custom threshold parameter
+- [x] 5.2 Viết property test cho custom threshold parameter
+
+
   - **Property 7: Custom threshold parameter**
   - **Validates: Requirements 4.1**
 
-- [ ] 5.3 Viết property test cho threshold range validation
+- [x] 5.3 Viết property test cho threshold range validation
+
+
   - **Property 8: Threshold range validation**
   - **Validates: Requirements 4.3**
 
-- [ ] 5.4 Viết property test cho response completeness
+- [-] 5.4 Viết property test cho response completeness
+
   - **Property 9: Response contains all required fields**
   - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7**
 
-- [ ] 5.5 Viết property test cho CORS headers
+- [x] 5.5 Viết property test cho CORS headers
+
+
   - **Property 12: CORS allows all origins**
   - **Validates: Requirements 8.1, 8.3**
 
-- [ ] 5.6 Viết unit tests cho API endpoints
+
+- [x] 5.6 Viết unit tests cho API endpoints
+
   - Test health check endpoint trả về đúng format
   - Test verify endpoint với ảnh hợp lệ
   - Test verify endpoint với file không phải ảnh
