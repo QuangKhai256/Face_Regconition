@@ -349,7 +349,12 @@
   - Handle error case when model not trained
   - _Requirements: 7.1, 7.2, 7.5, 7.6, 7.7, 7.8, 8.1, 8.2, 8.3, 8.5, 9.4_
 
-- [ ] 15. Implement main app structure
+- [x] 15. Implement main app structure
+
+
+
+
+
   - Create main.dart with MaterialApp
   - Implement bottom navigation with 3 tabs: Thu thập, Huấn luyện, Nhận diện
   - Add navigation between screens
