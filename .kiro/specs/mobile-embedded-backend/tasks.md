@@ -290,7 +290,18 @@
   - Add toJson/fromJson methods for serialization
   - _Requirements: All requirements use these models_
 
-- [ ] 12. Implement Collection Screen UI
+- [x] 12. Implement Collection Screen UI
+
+
+
+
+
+
+
+
+
+
+
   - Create CollectionScreen widget with camera preview
   - Add camera initialization in initState
   - Add capture button that calls CameraService.captureImage()
