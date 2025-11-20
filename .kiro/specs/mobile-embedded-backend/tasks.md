@@ -250,13 +250,31 @@
   - **Property 16: Threshold range validation**
   - **Validates: Requirements 8.2**
 
-- [ ] 10. Implement image resizing utility
+- [x] 10. Implement image resizing utility
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   - Create ImageUtils class
   - Implement resizeImage() to resize images larger than 1920x1080
   - Maintain aspect ratio during resize
   - _Requirements: 11.2_
 
-- [ ] 10.1 Write property test for image resize
+- [x] 10.1 Write property test for image resize
+
+
+
+
   - **Property 18: Image resize constraint**
   - **Validates: Requirements 11.2**
 
