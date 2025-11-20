@@ -429,5 +429,10 @@
   - Test error scenarios
   - _Requirements: All requirements_
 
-- [ ] 20. Checkpoint - Ensure all tests pass
+- [x] 20. Checkpoint - Ensure all tests pass
+
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
