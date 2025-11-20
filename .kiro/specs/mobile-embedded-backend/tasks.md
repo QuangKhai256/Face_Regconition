@@ -387,7 +387,12 @@
   - Add try-catch blocks for all service calls
   - _Requirements: 9.5, 9.6, 9.7, 12.1, 12.2, 12.3, 12.4_
 
-- [ ] 18. Optimize performance
+- [x] 18. Optimize performance
+
+
+
+
+
   - Cache TFLite model in memory after first load
   - Resize images before processing
   - Release camera when switching tabs
