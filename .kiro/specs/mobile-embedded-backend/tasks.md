@@ -132,7 +132,12 @@
   - Test warning generation for each threshold
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
 
-- [ ] 6. Implement Embedding Service with TensorFlow Lite
+- [x] 6. Implement Embedding Service with TensorFlow Lite
+
+
+
+
+
   - Create EmbeddingService class
   - Implement loadModel() to load MobileFaceNet TFLite model from assets
   - Implement _preprocessImage() to resize face to 112x112 and normalize
@@ -142,12 +147,19 @@
   - Implement dispose() to release model resources
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 6.1 Write property test for embedding extraction
+- [x] 6.1 Write property test for embedding extraction
+
+
+
+
+
   - **Property 8: Embedding extraction success**
   - **Property 9: Embedding dimension consistency**
   - **Validates: Requirements 5.3, 5.4**
 
-- [ ] 6.2 Write unit tests for embedding service
+- [x] 6.2 Write unit tests for embedding service
+
+
   - Test model loading
   - Test image preprocessing
   - Test embedding dimension (128)
