@@ -101,7 +101,12 @@
   - Test with image containing exactly one face
   - _Requirements: 2.2, 2.3, 2.4_
 
-- [ ] 5. Implement Environment Check Service
+- [x] 5. Implement Environment Check Service
+
+
+
+
+
   - Create EnvironmentService class
   - Implement analyzeEnvironment() that takes image and face box
   - Implement _calculateBrightness() using grayscale mean
@@ -111,12 +116,16 @@
   - Return EnvironmentInfo with all metrics and warnings
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
 
-- [ ] 5.1 Write property test for environment metrics
+- [x] 5.1 Write property test for environment metrics
+
+
   - **Property 4: Environment metrics calculation**
   - **Property 5: Environment threshold consistency**
   - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7**
 
-- [ ] 5.2 Write unit tests for environment calculations
+- [x] 5.2 Write unit tests for environment calculations
+
+
   - Test brightness calculation with known images
   - Test blur score calculation with sharp and blurry images
   - Test face size ratio calculation
