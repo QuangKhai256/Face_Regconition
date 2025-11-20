@@ -1,0 +1,1 @@
+ D:\\Code\\A.Kiem_thu_phan_mem\\Face_Recognition\\Face_Regconition\\mobile\\.dart_tool\\flutter_build\\62c451e1a7e5882c888fb844135ad5eb\\native_assets.json: 
