@@ -73,7 +73,12 @@
   - Test resource cleanup
   - _Requirements: 1.1, 1.3_
 
-- [ ] 4. Implement Face Detection Service using ML Kit
+- [x] 4. Implement Face Detection Service using ML Kit
+
+
+
+
+
   - Create FaceDetectionService class
   - Implement detectFaces() using ML Kit Face Detection
   - Implement detectSingleFace() that validates exactly one face
@@ -81,12 +86,16 @@
   - Add error handling for no face and multiple faces cases
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 4.1 Write property test for face detection
+- [x] 4.1 Write property test for face detection
+
+
   - **Property 2: Face detection returns result**
   - **Property 3: Single face bounding box validity**
   - **Validates: Requirements 2.1, 2.4**
 
-- [ ] 4.2 Write unit tests for face detection edge cases
+- [x] 4.2 Write unit tests for face detection edge cases
+
+
   - Test with image containing no faces
   - Test with image containing multiple faces
   - Test with image containing exactly one face
