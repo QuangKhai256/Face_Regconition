@@ -361,7 +361,12 @@
   - Configure app theme
   - _Requirements: 9.1_
 
-- [ ] 16. Implement permission handling
+- [x] 16. Implement permission handling
+
+
+
+
+
   - Request camera permission on app start
   - Request storage permission if needed (Android < 10)
   - Show permission rationale dialogs
