@@ -233,13 +233,20 @@
   - Test threshold comparison (match and no match cases)
   - _Requirements: 7.2, 7.4, 7.5, 7.6_
 
-- [ ] 9. Implement threshold management
+- [x] 9. Implement threshold management
+
+
+
+
+
   - Add threshold validation to ensure range [0.3, 1.0]
   - Integrate threshold save/load in VerificationScreen
   - Set default threshold to 0.6
   - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 9.1 Write property test for threshold
+- [x] 9.1 Write property test for threshold
+
+
   - **Property 16: Threshold range validation**
   - **Validates: Requirements 8.2**
 
